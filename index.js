@@ -56,3 +56,4 @@ function sendSniperSignal(asset, type, entry, sl, tp) {
 
 // INITIALISATION DU SYSTÈME
 console.log("Terminal Sniper Activé - Scan permanent des flux GainX/PainX..."); //
+  
