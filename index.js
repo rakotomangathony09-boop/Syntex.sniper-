@@ -7,7 +7,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 // CONFIGURATION DES IDENTIFIANTS
-const token = '8694426433:AAF7cN9d_BPoV7MKAz0O2foXdmRz6F035mo'; //
+const token = '8694426433:AAEMHhIwUafDp3x_d2T2S0VyqU8jH6jdhf4'; //
 const chatId = '7170171829'; //
 const bot = new TelegramBot(token, {polling: true});
 
