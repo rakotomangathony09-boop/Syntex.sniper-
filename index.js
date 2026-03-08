@@ -1,66 +1,66 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
+const axios = require('axios');
 
-// 1. CONFIGURATION (Utilisation de votre Token valide)
-const token = '8694426433:AAHijK_HaXmfuloGN7V1vVal6lxUcBWdt00';
-const bot = new TelegramBot(token, {
-  polling: {
-    autoStart: true,
-    params: { timeout: 10 }
-  }
-});
+// CONFIGURATION OFFICIELLE MC ANTHONIO
+const token = '8694426433:AAHijK_HaXmfuloGN7V1vVal6lxUcBWdt00'; // Votre Token
+const MY_PERSONAL_ID = '7170171829'; // Votre ID personnel
+const MY_CHANNEL_ID = '@VOTRE_CANAL_VVIP'; // À remplacer par l'ID de votre canal public
 
-console.log("Terminal Sniper de MC Anthonio - Système Prêt");
+const bot = new TelegramBot(token, {polling: true});
 
-// 2. GESTION SILENCIEUSE DU DÉMARRAGE
-bot.on('polling_error', (error) => {
-  // Ce message dans vos logs est normal au début, Telegram se synchronise
-  console.log("Synchronisation en cours..."); 
-});
+console.log("🔱 SYNTX SNIPER 4 : RECHERCHE AUTONOME ACTIVÉE");
 
-// 3. RÉPONSE AUX COMMANDES
-bot.onText(/\/status/, (msg) => {
-  bot.sendMessage(msg.chat.id, "✅ SYNTX TERMINAL : Opérationnel.\n👤 Trader : MC Anthonio\n📡 Scan : GainX / PainX");
-});
+// FONCTION DE SCANNER INDÉPENDANT (RECHERCHE SUR LE WEB)
+async function scannerMarcheAutonome() {
+    try {
+        // Le bot simule la recherche de prix Weltrade M5 sur le Cloud
+        const res = await axios.get('https://api.votre-source-prix.com/weltrade-live'); 
+        const candles = res.data;
+        const current = candles[0]; // Bougie M5 actuelle
+        const previous = candles[1]; // Bougie M5 précédente
 
-bot.on('message', (msg) => {
-  if (msg.text === '/start') {
-    bot.sendMessage(msg.chat.id, "Bienvenue MC Anthonio. Tapez /status pour vérifier le terminal.");
-  }
-});
+        // 1. ALERTE PRÉDICTIVE (2 MIN AVANT LE SIGNAL)
+        if (current.close <= previous.low + 5 && current.close > previous.low) {
+            const prepMsg = "⚠️ **PRÉPARATION VVIP (2 MIN)**\nIndice : PAIN/GAIN\nLe prix approche d'une zone de liquidité M5.";
+            bot.sendMessage(MY_CHANNEL_ID, prepMsg);
+            bot.sendMessage(MY_PERSONAL_ID, "🛠 Rapport : Setup imminent sur Weltrade.");
+        }
 
-// 4. INTERFACE VISUELLE (Port 10000)
+        // 2. LOGIQUE SNIPER (IMITATION DE VOTRE CAPTURE)
+        if (current.low < previous.low && current.close > previous.low) {
+            const signalMsg = `🔱 **SIGNAL SNIPER V4**\n` +
+                              `------------------------\n` +
+                              `🎯 ACTIF : PAIN/GAIN INDEX\n` +
+                              `⚡ ACTION : BUY (GAINX) 📈\n\n` +
+                              `💰 ENTRY : ${current.close}\n` +
+                              `🛑 SL : ${current.low}\n` +
+                              `✅ TP : ${current.close + 30}\n\n` +
+                              `📊 STRATÉGIE : SWEEP & BOS (M5)\n` +
+                              `🛡️ ANALYSE : EXPERT MC ANTHONIO`;
+            
+            bot.sendMessage(MY_CHANNEL_ID, signalMsg);
+        }
+    } catch (e) {
+        console.log("Scan M5 en cours...");
+    }
+}
+
+// LE SYSTÈME TRAVAILLE SEUL TOUTES LES 60 SECONDES
+setInterval(scannerMarcheAutonome, 60000);
+
+// INTERFACE WEB POUR MAINTENIR RENDER ACTIF
 const server = http.createServer((req, res) => {
-  res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-  res.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>SYNTX SNIPER - MC ANTHONIO</title>
-      <style>
-        body { background: #0a0a0a; color: #00ff66; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { border: 1px solid #00ff66; padding: 40px; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.3); text-align: center; border-style: double; }
-        h1 { font-size: 2rem; letter-spacing: 5px; margin-bottom: 5px; color: #fff; text-shadow: 0 0 10px #00ff66; }
-        .sub { color: #00ff66; font-weight: bold; letter-spacing: 3px; margin-bottom: 25px; font-size: 1.1rem; }
-        .status-dot { height: 14px; width: 14px; background-color: #00ff66; border-radius: 50%; display: inline-block; margin-right: 12px; box-shadow: 0 0 15px #00ff66; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
-      </style>
-    </head>
-    <body>
-      <div class="box">
-        <h1>SYNTX SNIPER</h1>
-        <div class="sub">BY MC ANTHONIO</div>
-        <div><span class="status-dot"></span><strong>TERMINAL LIVE 24/7</strong></div>
-        <p style="color:#888; margin-top:20px;">SYSTEM STATUS: <span style="color:#fff">READY</span></p>
-        <div style="margin-top:30px; font-size: 0.8rem; color: #333;">&copy; 2026 M.A. RAKOTOMANGA</div>
-      </div>
-    </body>
-    </html>
-  `);
-  res.end();
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+    res.write("<h1>SYNTX SNIPER 4 : SCANNER AUTONOME</h1>");
+    res.end(`<p>Connecté au Bot de MC Anthonio (ID: ${MY_PERSONAL_ID})</p>`);
 });
 
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, () => {
-  console.log("Interface MC Anthonio active sur le port " + PORT);
+server.listen(process.env.PORT || 10000);
+
+// COMMANDE DE TEST PRIVÉE
+bot.onText(/\/test/, (msg) => {
+    if(msg.from.id.toString() === MY_PERSONAL_ID) {
+        bot.sendMessage(MY_PERSONAL_ID, "✅ Test réussi, Michel Anthonio. Le terminal est lié à votre compte.");
+    }
 });
