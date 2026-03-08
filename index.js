@@ -1,79 +1,59 @@
 const TelegramBot = require('node-telegram-bot-api');
-const http = require('http');
 const axios = require('axios');
+const express = require('express');
+const app = express();
 
-// --- CONFIGURATION SÉCURISÉE MC ANTHONIO ---
-const token = '8694426433:AAHijK_HaXmfuloGN7V1vVal6lxUcBWdt00'; 
-const MY_PERSONAL_ID = '7170171829'; 
-const MY_CHANNEL_ID = '-1003850314405'; // Votre ID de Canal Privé
+// --- CONFIGURATION OFFICIELLE MC ANTHONIO ---
+const CONFIG = {
+    token: '8694426433:AAHijK_HaXmfuloGN7V1vVal6lxUcBWdt00',
+    channelId: '-1003850314405',
+    adminId: '7170171829',
+    // Gamme complète vérifiée selon votre capture
+    assets: [
+        'GainX 400', 'PainX 400', 
+        'GainX 600', 'PainX 600', 
+        'GainX 800', 'PainX 800', 
+        'GainX 999', 'PainX 999', 
+        'GainX 1200', 'PainX 1200'
+    ]
+};
 
-// Correction du conflit 409 : On active le polling avec une sécurité
-const bot = new TelegramBot(token, {
-    polling: {
-        interval: 300,
-        autoStart: true,
-        params: { timeout: 10 }
-    }
-});
+const bot = new TelegramBot(CONFIG.token, { polling: true });
 
-console.log("🔱 TERMINAL ACTIVÉ : SURVEILLANCE WELTRADE M5 EN COURS...");
+// --- LOGIQUE DE SCANNER M5 ---
+async function runAutoTrade() {
+    for (const symbol of CONFIG.assets) {
+        try {
+            // Simulation de l'appel API Weltrade
+            const response = await axios.get(`https://api.votre-source.com/quotes/${symbol}`);
+            const { low, close, prevLow } = response.data;
 
-// --- LOGIQUE DE SCANNER AUTONOME (SWEEP & BOS) ---
-async function executerScanner() {
-    try {
-        // Simulation de l'appel API vers le flux Weltrade
-        // Note : Remplacez par votre URL de flux de données réelle si nécessaire
-        const response = await axios.get('https://api.votre-source-prix.com/weltrade-live');
-        const data = response.data;
-        const currentCandle = data[0];
-        const previousCandle = data[1];
-
-        // 1. DÉTECTION DU SWEEP (BALAYAGE DE LIQUIDITÉ)
-        if (currentCandle.low < previousCandle.low && currentCandle.close > previousCandle.low) {
-            
-            const messageSignal = `🔱 **SIGNAL SNIPER V4**\n` +
+            // STRATÉGIE SWEEP & RECOVERY
+            if (low < prevLow && close > prevLow) {
+                const tp = close + (close - low) * 2;
+                const message = `🔱 **SYNTX SNIPER V4**\n` +
                                 `------------------------\n` +
-                                `🎯 INDICE : PAIN/GAIN\n` +
-                                `⚡ ACTION : BUY (GAINX) 📈\n\n` +
-                                `💰 ENTRY : ${currentCandle.close}\n` +
-                                `🛑 SL : ${currentCandle.low}\n` +
-                                `✅ TP : ${currentCandle.close + 35}\n\n` +
-                                `📊 ANALYSE : SWEEP CONFIRMÉ M5\n` +
+                                `🎯 INDICE : ${symbol.toUpperCase()}\n` +
+                                `⚡ ACTION : BUY 📈\n\n` +
+                                `💰 ENTRY : ${close.toFixed(2)}\n` +
+                                `🛑 SL : ${low.toFixed(2)}\n` +
+                                `✅ TP : ${tp.toFixed(2)}\n\n` +
                                 `🛡️ MC ANTHONIO ALGO VVIP`;
-
-            bot.sendMessage(MY_CHANNEL_ID, messageSignal, { parse_mode: 'Markdown' });
-            bot.sendMessage(MY_PERSONAL_ID, "✅ Nouveau signal envoyé au groupe VVIP.");
-        }
-    } catch (error) {
-        console.log("Scan en cours... (Attente de clôture de bougie)");
+                
+                bot.sendMessage(CONFIG.channelId, message, { parse_mode: 'Markdown' });
+            }
+        } catch (e) { continue; }
     }
 }
 
-// Exécution du scanner chaque minute
-setInterval(executerScanner, 60000);
+// Rotation toutes les 60 secondes
+setInterval(runAutoTrade, 60000);
 
-// --- INTERFACE DE MAINTIEN POUR RENDER ---
-const server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-    res.write("<h2>SYNTX SNIPER 4 : STATUS LIVE 🚀</h2>");
-    res.write(`<p>Connecté au canal : ${MY_CHANNEL_ID}</p>`);
-    res.end();
+// Accueil automatique des nouveaux membres
+bot.on('new_chat_members', (msg) => {
+    bot.sendMessage(msg.chat.id, `BIENVENUE DANS L'ÉLITE SYNTX V4 🚀\n\nPropriété de RAKOTOMANGA Michel Anthonio.`);
 });
 
-// Utilisation du port dynamique de Render
-server.listen(process.env.PORT || 10000);
-
-// --- COMMANDE DE TEST ---
-bot.onText(/\/test/, (msg) => {
-    if(msg.from.id.toString() === MY_PERSONAL_ID) {
-        bot.sendMessage(MY_CHANNEL_ID, "🚀 SYNTX SNIPER 4 : Connexion établie. Le scanner est en ligne.");
-    }
-});
-
-// Gestion propre des erreurs pour éviter les crashs rouges
-bot.on('polling_error', (error) => {
-    if (error.code !== 'ETELEGRAM' || error.response.body.error_code !== 409) {
-        console.log("Erreur Telegram :", error.code);
-    }
-});
-        
+// Serveur de maintien pour Render
+app.get('/', (req, res) => { res.send("MC ANTHONIO TERMINAL : LIVE"); });
+app.listen(process.env.PORT || 10000);
