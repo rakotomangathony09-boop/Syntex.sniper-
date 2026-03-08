@@ -1,13 +1,13 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
 
-// 1. CONFIGURATION DU BOT AVEC LE NOUVEAU TOKEN
-const token = '8694426433:AAHXEyy5mIX-u5HfcjRLfeE9tFJNQ5X11-s';
+// 1. CONFIGURATION AVEC LE TOKEN TOUT NEUF (RESET TOTAL)
+const token = '8694426433:AAGoR9CfWOqJkNIrmO9s9LdrqTkjCCYdLoA';
 const bot = new TelegramBot(token, {polling: true});
 
 console.log("Terminal Sniper Activé - Scan permanent des flux GainX/PainX...");
 
-// 2. LOGIQUE DE RÉPONSE DU BOT
+// 2. LOGIQUE DU BOT
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   if (msg.text === '/status') {
@@ -15,7 +15,7 @@ bot.on('message', (msg) => {
   }
 });
 
-// 3. INTERFACE WEB (Indispensable pour Render et UptimeRobot)
+// 3. INTERFACE DE MONITORING (Écran de contrôle pro)
 const server = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
   res.write(`
@@ -46,7 +46,7 @@ const server = http.createServer((req, res) => {
   res.end();
 });
 
-// Utilisation du port 10000 imposé par Render
+// Port dynamique pour Render
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
   console.log("Serveur de monitoring lancé sur le port " + PORT);
